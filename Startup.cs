@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore;
 using MeetSport.Models;
 
 namespace MeetSport
@@ -26,10 +28,12 @@ namespace MeetSport
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<projetContext>(optionsBuilder =>
+            {
+                optionsBuilder.UseMySql(Configuration.GetConnectionString("MeetSportUrl"), x => x.ServerVersion(Configuration.GetConnectionString("MeetSportVersion")));
+            });
+               
             services.AddControllers();
-            /*services.AddDbContextPool<projetContext>(optionsBuilder => {
-                optionsBuilder.us
-            });*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

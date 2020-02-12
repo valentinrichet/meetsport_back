@@ -6,17 +6,14 @@ using Microsoft.Extensions.Configuration;
 namespace MeetSport.Models
 {
     public partial class projetContext : DbContext
-    {
-        public IConfiguration Configuration { get; }
-        
+    {        
         public projetContext()
         {
         }
 
-        public projetContext(IConfiguration configuration, DbContextOptions<projetContext> options)
+        public projetContext(DbContextOptions<projetContext> options)
             : base(options)
         {
-            Configuration = configuration;
         }
 
         public virtual DbSet<AthleticUser> AthleticUser { get; set; }
@@ -30,15 +27,6 @@ namespace MeetSport.Models
         public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<RoleClaim> RoleClaim { get; set; }
         public virtual DbSet<User> User { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseMySql(Configuration.GetConnectionString("MeetSportUrl"), x => x.ServerVersion(Configuration.GetConnectionString("MeetSportVersion")));
-            }
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

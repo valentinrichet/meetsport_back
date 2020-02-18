@@ -12,8 +12,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore;
-using MeetSport.Models;
 using Microsoft.OpenApi.Models;
+using MeetSport.Dbo;
+using MeetSport.Repositories;
+using MeetSport.Repositories.Database;
 
 namespace MeetSport
 {
@@ -30,10 +32,11 @@ namespace MeetSport
         public void ConfigureServices(IServiceCollection services)
         {
             /* Configure Database */
-            services.AddDbContext<projetContext>(optionsBuilder =>
+            services.AddDbContext<MeetSportContext>(optionsBuilder =>
             {
                 optionsBuilder.UseMySql(Configuration.GetConnectionString(Settings.CONNECTION_STRING_URL), x => x.ServerVersion(Configuration.GetConnectionString(Settings.CONNECTION_STRING_VERSION)));
             });
+            /* ****************** */
 
             /* Configure Swagger */
             services.AddSwaggerGen(c =>
@@ -53,8 +56,19 @@ namespace MeetSport
                     }
                 });
             });
+            /* ***************** */
 
+            /* Register Repositories */
+            services.AddScoped<IRepository<Role>, DbRoleRepository>();
+            /* ********************* */
+
+            /* Register Business */
+
+            /* ***************** */
+
+            /* Configure Controllers */
             services.AddControllers();
+            /* ********************* */
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

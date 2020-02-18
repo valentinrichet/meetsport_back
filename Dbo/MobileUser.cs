@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MeetSport.Models
+namespace MeetSport.Dbo
 {
     public partial class MobileUser
     {

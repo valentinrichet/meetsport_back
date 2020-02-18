@@ -1,17 +1,16 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Extensions.Configuration;
 
-namespace MeetSport.Models
+namespace MeetSport.Dbo
 {
-    public partial class projetContext : DbContext
-    {        
-        public projetContext()
+    public partial class MeetSportContext : DbContext
+    {
+        public MeetSportContext()
         {
         }
 
-        public projetContext(DbContextOptions<projetContext> options)
+        public MeetSportContext(DbContextOptions<MeetSportContext> options)
             : base(options)
         {
         }

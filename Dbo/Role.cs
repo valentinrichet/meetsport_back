@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MeetSport.Models
+namespace MeetSport.Dbo
 {
-    public partial class Role
+    public partial class Role : IEntity
     {
         public Role()
         {

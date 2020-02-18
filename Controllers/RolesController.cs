@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MeetSport.Models;
+using MeetSport.Dbo;
+using MeetSport.Repositories;
 
 namespace MeetSport.Controllers
 {
@@ -13,10 +14,12 @@ namespace MeetSport.Controllers
     [ApiController]
     public class RolesController : ControllerBase
     {
-        private readonly projetContext _context;
+        private readonly IRepository<Role> _repository;
+        private readonly MeetSportContext _context;
 
-        public RolesController(projetContext context)
+        public RolesController(IRepository<Role> repository, MeetSportContext context)
         {
+            _repository = repository;
             _context = context;
         }
 
@@ -24,7 +27,7 @@ namespace MeetSport.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Role>>> GetRole()
         {
-            return await _context.Role.ToListAsync();
+            return await _repository.GetAll();
         }
 
         // GET: api/Roles/5

@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace MeetSport.Repositories
 {
-    public interface IRepository<T>
+    public interface IRepository<TEntity>
     {
-        Task<List<T>> GetAll();
-        Task<T> Get(ulong id);
-        Task<T> Add(T entity);
-        Task<T> Update(T entity);
-        Task<T> Delete(ulong id);
+        Task<TEntity> Add(TEntity entity);
+        Task<bool> Delete(params ulong[] primaryKey);
+        Task<TEntity> Get(params ulong[] primaryKey);
+        IQueryable<TEntity> GetAll();
+        Task<TEntity> Update(TEntity entity);
     }
 }

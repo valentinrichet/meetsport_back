@@ -16,6 +16,9 @@ using Microsoft.OpenApi.Models;
 using MeetSport.Dbo;
 using MeetSport.Repositories;
 using MeetSport.Repositories.Database;
+using MeetSport.Business;
+using MeetSport.Business.Database;
+using AutoMapper;
 
 namespace MeetSport
 {
@@ -58,12 +61,16 @@ namespace MeetSport
             });
             /* ***************** */
 
+            /* Register Automapper */
+            services.AddAutoMapper(typeof(Startup));
+            /* ******************* */
+
             /* Register Repositories */
-            services.AddScoped<IRepository<Role>, DbRoleRepository>();
+            services.AddScoped<IRepository<Role>, DbRepository<Role>>();
             /* ********************* */
 
             /* Register Business */
-
+            services.AddScoped<IBusiness<Role>, Business<Role, IRepository<Role>>>();
             /* ***************** */
 
             /* Configure Controllers */

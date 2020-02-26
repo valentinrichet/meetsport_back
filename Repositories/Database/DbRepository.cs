@@ -7,50 +7,62 @@ using System.Threading.Tasks;
 
 namespace MeetSport.Repositories.Database
 {
-    public abstract class DbRepository<TEntity, TContext> : IRepository<TEntity>
-    where TEntity : class, IEntity
-    where TContext : DbContext
+    public class DbRepository<TEntity> : IRepository<TEntity>
+    where TEntity : class
     {
-        private readonly TContext context;
-        public DbRepository(TContext context)
+        protected readonly MeetSportContext _context;
+        public DbRepository(MeetSportContext context)
         {
-            this.context = context;
+            _context = context;
         }
         public async Task<TEntity> Add(TEntity entity)
         {
-            context.Set<TEntity>().Add(entity);
-            await context.SaveChangesAsync();
+            _context.Set<TEntity>().Add(entity);
+            await _context.SaveChangesAsync();
             return entity;
         }
 
-        public async Task<TEntity> Delete(ulong id)
+        public async Task<bool> Delete(params ulong[] primaryKey)
         {
-            var entity = await context.Set<TEntity>().FindAsync(id);
+            TEntity entity = await Get(primaryKey);
+
             if (entity == null)
             {
-                return entity;
+                return false;
             }
 
-            context.Set<TEntity>().Remove(entity);
-            await context.SaveChangesAsync();
+            _context.Set<TEntity>().Remove(entity);
+            await _context.SaveChangesAsync();
 
+            return true;
+        }
+
+        public async Task<TEntity> Get(params ulong[] primaryKey)
+        {
+            TEntity entity;
+
+            if(primaryKey.Length == 1)
+            {
+                entity = await _context.Set<TEntity>().FindAsync(primaryKey[0]);
+            }
+            else
+            {
+                entity = await _context.Set<TEntity>().FindAsync(primaryKey);
+            }
+                          
             return entity;
         }
 
-        public async Task<TEntity> Get(ulong id)
+        public IQueryable<TEntity> GetAll()
         {
-            return await context.Set<TEntity>().FindAsync(id);
-        }
-
-        public async Task<List<TEntity>> GetAll()
-        {
-            return await context.Set<TEntity>().ToListAsync();
+            IQueryable<TEntity> queryable = _context.Set<TEntity>();
+            return queryable;
         }
 
         public async Task<TEntity> Update(TEntity entity)
         {
-            context.Entry(entity).State = EntityState.Modified;
-            await context.SaveChangesAsync();
+            _context.Entry(entity).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
             return entity;
         }
     }

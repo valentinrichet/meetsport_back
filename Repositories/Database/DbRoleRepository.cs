@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace MeetSport.Repositories.Database
 {
-    public class DbRoleRepository : DbRepository<Role, MeetSportContext>
+    public class DbRoleRepository : DbRepository<Role>
     {
         public DbRoleRepository(MeetSportContext context) : base(context)
         {
-
         }
-        // We can add new methods specific to the movie repository here in the future
     }
 }

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MeetSport.Dbo;
 using MeetSport.Repositories;
+using MeetSport.Business;
+using MeetSport.Dto.Roles;
 
 namespace MeetSport.Controllers
 {
@@ -14,20 +16,21 @@ namespace MeetSport.Controllers
     [ApiController]
     public class RolesController : ControllerBase
     {
-        private readonly IRepository<Role> _repository;
+        private readonly IBusiness<Role> _business;
         private readonly MeetSportContext _context;
 
-        public RolesController(IRepository<Role> repository, MeetSportContext context)
+        public RolesController(IBusiness<Role> business, MeetSportContext context)
         {
-            _repository = repository;
+            _business = business;
             _context = context;
         }
 
         // GET: api/Roles
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Role>>> GetRole()
+        public async Task<ActionResult<ICollection<RoleDto>>> GetRole()
         {
-            return await _repository.GetAll();
+            ICollection<RoleDto> roles = await _business.GetAll<RoleDto>();
+            return Ok(roles);
         }
 
         // GET: api/Roles/5
@@ -48,8 +51,11 @@ namespace MeetSport.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRole(ulong id, Role role)
+        public async Task<IActionResult> PutRole(ulong id, UpdateRoleDto roleDto)
         {
+            RoleDto role = await _business.Update<RoleDto, UpdateRoleDto>(roleDto, id);
+            return Ok(role);
+            /*
             if (id != role.Id)
             {
                 return BadRequest();
@@ -74,6 +80,7 @@ namespace MeetSport.Controllers
             }
 
             return NoContent();
+            */
         }
 
         // POST: api/Roles

@@ -13,17 +13,17 @@ namespace MeetSport.Repositories.Stub
             throw new NotImplementedException();
         }
 
-        public Task<TEntity> Delete(ulong id)
+        public Task<bool> Delete(params ulong[] primaryKey)
         {
             throw new NotImplementedException();
         }
 
-        public Task<TEntity> Get(ulong id)
+        public Task<TEntity> Get(params ulong[] primaryKey)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<TEntity>> GetAll()
+        public IQueryable<TEntity> GetAll()
         {
             throw new NotImplementedException();
         }

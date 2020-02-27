@@ -29,10 +29,9 @@ namespace MeetSport.Business.Database
             return mappedEntity;
         }
 
-        public async Task<bool> Delete(params ulong[] primaryKey)
+        public Task Delete(params ulong[] primaryKey)
         {
-            bool isDeleted = await _repository.Delete(primaryKey);
-            return isDeleted;
+            return _repository.Delete(primaryKey);
         }
 
         public async Task<Dto> Get<Dto>(params ulong[] primaryKey)

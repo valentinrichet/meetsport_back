@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MeetSport.Repositories.Database
 {
-    public class DbRoleRepository : DbRepository<Role>
+    public class DbRoleRepository : DbRepository<Role, MeetSportContext>
     {
         public DbRoleRepository(MeetSportContext context) : base(context)
         {

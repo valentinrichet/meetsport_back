@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MeetSport.Dbo
 {
-    public partial class Role : IEntity
+    public partial class Role
     {
         public Role()
         {

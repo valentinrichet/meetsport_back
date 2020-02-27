@@ -9,7 +9,7 @@ namespace MeetSport.Repositories
     public interface IRepository<TEntity>
     {
         Task<TEntity> Add(TEntity entity);
-        Task<bool> Delete(params ulong[] primaryKey);
+        Task Delete(params ulong[] primaryKey);
         Task<TEntity> Get(params ulong[] primaryKey);
         IQueryable<TEntity> GetAll();
         Task<TEntity> Update(TEntity entity);

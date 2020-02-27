@@ -13,7 +13,7 @@ namespace MeetSport.Repositories.Stub
             throw new NotImplementedException();
         }
 
-        public Task<bool> Delete(params ulong[] primaryKey)
+        public Task Delete(params ulong[] primaryKey)
         {
             throw new NotImplementedException();
         }

@@ -22,6 +22,8 @@ namespace MeetSport.Mappings
                     opt => opt.MapFrom(r => r.User.Select(user => user.Id).ToList())
                 );
 
+            CreateMap<CreateRoleDto, Role>();
+
             CreateMap<UpdateRoleDto, Role>();
         }
     }

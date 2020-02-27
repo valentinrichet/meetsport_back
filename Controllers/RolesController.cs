@@ -9,6 +9,7 @@ using MeetSport.Dbo;
 using MeetSport.Repositories;
 using MeetSport.Business;
 using MeetSport.Dto.Roles;
+using System.ComponentModel.DataAnnotations;
 
 namespace MeetSport.Controllers
 {
@@ -17,17 +18,16 @@ namespace MeetSport.Controllers
     public class RolesController : ControllerBase
     {
         private readonly IBusiness<Role> _business;
-        private readonly MeetSportContext _context;
 
-        public RolesController(IBusiness<Role> business, MeetSportContext context)
+        public RolesController(IBusiness<Role> business)
         {
             _business = business;
-            _context = context;
         }
 
         // GET: api/Roles
         [HttpGet]
-        public async Task<ActionResult<ICollection<RoleDto>>> GetRole()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<ICollection<RoleDto>>> GetRoles()
         {
             ICollection<RoleDto> roles = await _business.GetAll<RoleDto>();
             return Ok(roles);
@@ -35,85 +35,57 @@ namespace MeetSport.Controllers
 
         // GET: api/Roles/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Role>> GetRole(ulong id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<RoleDto>> GetRole(ulong id)
         {
-            var role = await _context.Role.FindAsync(id);
+            RoleDto roleDto = await _business.Get<RoleDto>(id);
 
-            if (role == null)
+            if (roleDto == null)
             {
-                return NotFound();
+                return NotFound($"A role with id \"{id}\" was not found.");
             }
 
-            return role;
+            return Ok(roleDto);
         }
 
         // PUT: api/Roles/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRole(ulong id, UpdateRoleDto roleDto)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> PutRole(ulong id, UpdateRoleDto updateRoleDto)
         {
-            RoleDto role = await _business.Update<RoleDto, UpdateRoleDto>(roleDto, id);
-            return Ok(role);
-            /*
-            if (id != role.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(role).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                RoleDto roleDto = await _business.Update<RoleDto, UpdateRoleDto>(updateRoleDto, id);
+                return Ok(roleDto);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (ArgumentNullException)
             {
-                if (!RoleExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest($"A role with id \"{id}\" was not found.");
             }
-
-            return NoContent();
-            */
         }
 
         // POST: api/Roles
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Role>> PostRole(Role role)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult> PostRole(CreateRoleDto createRoleDto)
         {
-            _context.Role.Add(role);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetRole", new { id = role.Id }, role);
+            RoleDto roleDto = await _business.Add<RoleDto, CreateRoleDto>(createRoleDto);
+            return Created(roleDto.Id.ToString(), roleDto);
         }
 
         // DELETE: api/Roles/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Role>> DeleteRole(ulong id)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<ActionResult<bool>> DeleteRole(ulong id)
         {
-            var role = await _context.Role.FindAsync(id);
-            if (role == null)
-            {
-                return NotFound();
-            }
-
-            _context.Role.Remove(role);
-            await _context.SaveChangesAsync();
-
-            return role;
-        }
-
-        private bool RoleExists(ulong id)
-        {
-            return _context.Role.Any(e => e.Id == id);
+            await _business.Delete(id);
+            return NoContent();
         }
     }
 }

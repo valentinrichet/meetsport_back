@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace MeetSport.Repositories.Database
 {
-    public class DbRepository<TEntity> : IRepository<TEntity>
+    public class DbRepository<TEntity, TContext> : IRepository<TEntity>
     where TEntity : class
+    where TContext : DbContext
+
     {
-        protected readonly MeetSportContext _context;
-        public DbRepository(MeetSportContext context)
+        protected readonly TContext _context;
+        public DbRepository(TContext context)
         {
             _context = context;
         }
@@ -22,19 +24,15 @@ namespace MeetSport.Repositories.Database
             return entity;
         }
 
-        public async Task<bool> Delete(params ulong[] primaryKey)
+        public async Task Delete(params ulong[] primaryKey)
         {
             TEntity entity = await Get(primaryKey);
 
-            if (entity == null)
+            if (entity != null)
             {
-                return false;
+                _context.Set<TEntity>().Remove(entity);
+                await _context.SaveChangesAsync();
             }
-
-            _context.Set<TEntity>().Remove(entity);
-            await _context.SaveChangesAsync();
-
-            return true;
         }
 
         public async Task<TEntity> Get(params ulong[] primaryKey)

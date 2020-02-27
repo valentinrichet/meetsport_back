@@ -19,6 +19,8 @@ using MeetSport.Repositories.Database;
 using MeetSport.Business;
 using MeetSport.Business.Database;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace MeetSport
 {
@@ -66,7 +68,7 @@ namespace MeetSport
             /* ******************* */
 
             /* Register Repositories */
-            services.AddScoped<IRepository<Role>, DbRepository<Role>>();
+            services.AddScoped<IRepository<Role>, DbRepository<Role, MeetSportContext>>();
             /* ********************* */
 
             /* Register Business */
@@ -80,14 +82,39 @@ namespace MeetSport
             /* Configure Controllers */
             services.AddControllers();
             /* ********************* */
+
+            /* Configure InvalidModelStateResponseFactory */
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    ValidationProblemDetails problemDetails = new ValidationProblemDetails(context.ModelState);
+                    BadRequestObjectResult result = new BadRequestObjectResult(problemDetails.Errors);
+                    return result;
+                };
+            });
+            /* ****************************************** */
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler(errorApp =>
+                {
+                    errorApp.Run(async context =>
+                    {
+                        IExceptionHandlerPathFeature exceptionHandler = context.Features.Get<IExceptionHandlerPathFeature>();
+                        logger.LogError(exceptionHandler.Error, exceptionHandler.Path);
+                        context.Response.StatusCode = 500;
+                        await context.Response.WriteAsync("There was an error with the server, please try again later...");
+                    });
+                });
             }
 
             app.UseHttpsRedirection();

@@ -21,6 +21,8 @@ using MeetSport.Business.Database;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Diagnostics;
+using System.Reflection;
+using System.IO;
 
 namespace MeetSport
 {
@@ -60,6 +62,11 @@ namespace MeetSport
                         Email = swaggerContactSection.GetValue<string>(Settings.SWAGGER_CONTACT_EMAIL)
                     }
                 });
+
+                // Set the comments path for the Swagger JSON and UI.
+                string xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
+                string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
             /* ***************** */
 

@@ -1,37 +1,39 @@
-﻿using Microsoft.Extensions.Options;
+﻿using MeetSport.Options;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace MeetSport.Services.PasswordHasher
 {
     public sealed class PasswordHasher : IPasswordHasher
     {
-        /*
-        private const int SaltSize = 16; // 128 bit 
-        private const int KeySize = 32; // 256 bit
+        private HashingOptions HashingOptions { get; }
 
-        public PasswordHasher(IOptions<HashingOptions> options)
+        public PasswordHasher(IOptions<HashingOptions> hashingOptions)
         {
-            Options = options.Value;
+            HashingOptions = hashingOptions.Value;
         }
-
-        private HashingOptions Options { get; }
 
         public string Hash(string password)
         {
-            using (var algorithm = new Rfc2898DeriveBytes(
+            /*
+            using (Rfc2898DeriveBytes algorithm = new Rfc2898DeriveBytes(
               password,
-              SaltSize,
-              Options.Iterations,
+              new byte[] {164,176,124,62,244,154,226,211,177,90,202,180,12,142,25,225},
+              HashingOptions.Iterations,
               HashAlgorithmName.SHA512))
             {
-                var key = Convert.ToBase64String(algorithm.GetBytes(KeySize));
-                var salt = Convert.ToBase64String(algorithm.Salt);
+                string key = Convert.ToBase64String(algorithm.GetBytes(KeySize));
+                string salt = Convert.ToBase64String(algorithm.Salt);
 
                 return $"{Options.Iterations}.{salt}.{key}";
-            }
+            }*/
+            var test = HashingOptions.Iterations;
+
+            return "";
         }
 
         public (bool Verified, bool NeedsUpgrade) Check(string hash, string password)
@@ -48,7 +50,7 @@ namespace MeetSport.Services.PasswordHasher
             var salt = Convert.FromBase64String(parts[1]);
             var key = Convert.FromBase64String(parts[2]);
 
-            var needsUpgrade = iterations != Options.Iterations;
+            var needsUpgrade = iterations != HashingOptions.Iterations;
 
             using (var algorithm = new Rfc2898DeriveBytes(
               password,
@@ -56,13 +58,12 @@ namespace MeetSport.Services.PasswordHasher
               iterations,
               HashAlgorithmName.SHA512))
             {
-                var keyToCheck = algorithm.GetBytes(KeySize);
+                var keyToCheck = algorithm.GetBytes(10);
 
                 var verified = keyToCheck.SequenceEqual(key);
 
                 return (verified, needsUpgrade);
             }
         }
-        */
     }
 }

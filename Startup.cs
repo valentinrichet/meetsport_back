@@ -24,6 +24,8 @@ using Microsoft.AspNetCore.Diagnostics;
 using System.Reflection;
 using System.IO;
 using MeetSport.Options;
+using MeetSport.Services;
+using MeetSport.Services.PasswordHasher;
 
 namespace MeetSport
 {
@@ -69,6 +71,14 @@ namespace MeetSport
                 c.IncludeXmlComments(xmlPath);
             });
             /* ***************** */
+
+            /* Register Options */
+            services.AddOptions<HashingOptions>().Bind(Configuration.GetSection("Hash"));
+            /* ******************* */
+
+            /* Register Services */
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
+            /* ******************* */
 
             /* Register Automapper */
             services.AddAutoMapper(typeof(Startup));

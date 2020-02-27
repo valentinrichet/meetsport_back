@@ -73,6 +73,10 @@ namespace MeetSport
             services.AddScoped<IBusiness<Role>, Business<Role, IRepository<Role>>>();
             /* ***************** */
 
+            /* Configure Cors */
+            services.AddCors();
+            /* ************** */
+
             /* Configure Controllers */
             services.AddControllers();
             /* ********************* */
@@ -101,6 +105,12 @@ namespace MeetSport
             });
 
             app.UseRouting();
+
+            // Global Cors Policy
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
 
             app.UseAuthorization();
 

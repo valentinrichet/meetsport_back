@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Reflection;
 using System.IO;
+using MeetSport.Options;
 
 namespace MeetSport
 {
@@ -48,18 +49,17 @@ namespace MeetSport
             /* Configure Swagger */
             services.AddSwaggerGen(c =>
             {
-                IConfigurationSection swaggerSection = Configuration.GetSection(Settings.SWAGGER);
-                IConfigurationSection swaggerContactSection = swaggerSection.GetSection(Settings.SWAGGER_CONTACT);
+                SwaggerOptions swaggerOptions = Configuration.GetSection(Settings.SWAGGER).Get<SwaggerOptions>();
 
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Version = swaggerSection.GetValue<string>(Settings.SWAGGER_VERSION),
-                    Title = swaggerSection.GetValue<string>(Settings.SWAGGER_TITLE),
-                    Description = swaggerSection.GetValue<string>(Settings.SWAGGER_DESCRIPTION),
+                    Version = swaggerOptions.Version,
+                    Title = swaggerOptions.Title,
+                    Description = swaggerOptions.Description,
                     Contact = new OpenApiContact
                     {
-                        Name = swaggerContactSection.GetValue<string>(Settings.SWAGGER_CONTACT_NAME),
-                        Email = swaggerContactSection.GetValue<string>(Settings.SWAGGER_CONTACT_EMAIL)
+                        Name = swaggerOptions.Contact.Name,
+                        Email = swaggerOptions.Contact.Email
                     }
                 });
 
@@ -133,9 +133,9 @@ namespace MeetSport
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                IConfigurationSection swaggerSection = Configuration.GetSection(Settings.SWAGGER);
+                SwaggerOptions swaggerOptions = Configuration.GetSection(Settings.SWAGGER).Get<SwaggerOptions>();
 
-                c.SwaggerEndpoint(swaggerSection.GetValue<string>(Settings.SWAGGER_ENDPOINT), $"{swaggerSection.GetValue<string>(Settings.SWAGGER_TITLE)} {swaggerSection.GetValue<string>(Settings.SWAGGER_VERSION)}");
+                c.SwaggerEndpoint(swaggerOptions.EndPoint, $"{swaggerOptions.Title} {swaggerOptions.Version}");
             });
 
             app.UseRouting();

@@ -21,9 +21,9 @@ namespace MeetSport.Business.Database
             this._mapper = mapper;
         }
 
-        public async Task<Dto> Add<Dto, CreationDto>(CreationDto entityDto)
+        public async Task<Dto> Add<Dto, CreationDto>(CreationDto creationDto)
         {
-            TEntity entity = _mapper.Map<TEntity>(entityDto);
+            TEntity entity = _mapper.Map<TEntity>(creationDto);
             entity = await _repository.Add(entity);
             Dto mappedEntity = _mapper.Map<Dto>(entity);
             return mappedEntity;
@@ -48,11 +48,11 @@ namespace MeetSport.Business.Database
             return dtoList;
         }
 
-        public async Task<Dto> Update<Dto, UpdateDto>(UpdateDto entityDto, params ulong[] primaryKey)
+        public async Task<Dto> Update<Dto, UpdateDto>(UpdateDto updateDto, params ulong[] primaryKey)
         {
-            TEntity entity = await this._repository.Get(primaryKey);
-            _mapper.Map(entityDto, entity);
-            await _repository.Update(entity);
+            TEntity entity = await _repository.Get(primaryKey);
+            _mapper.Map(updateDto, entity);
+            entity = await _repository.Update(entity);
             Dto mappedEntity = _mapper.Map<Dto>(entity);
             return mappedEntity;
         }

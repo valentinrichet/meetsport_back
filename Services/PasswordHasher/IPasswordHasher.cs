@@ -8,6 +8,6 @@ namespace MeetSport.Services
     public interface IPasswordHasher
     {
         string Hash(string password);
-        (bool Verified, bool NeedsUpgrade) Check(string hash, string password);
+        bool Check(string password, string hash);
     }
 }

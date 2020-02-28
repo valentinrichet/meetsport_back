@@ -19,51 +19,25 @@ namespace MeetSport.Services.PasswordHasher
 
         public string Hash(string password)
         {
-            /*
+            string hashedPassword;
+            byte[] salt = Convert.FromBase64String(HashingOptions.Salt);
             using (Rfc2898DeriveBytes algorithm = new Rfc2898DeriveBytes(
               password,
-              new byte[] {164,176,124,62,244,154,226,211,177,90,202,180,12,142,25,225},
+              salt,
               HashingOptions.Iterations,
               HashAlgorithmName.SHA512))
             {
-                string key = Convert.ToBase64String(algorithm.GetBytes(KeySize));
-                string salt = Convert.ToBase64String(algorithm.Salt);
+                hashedPassword = Convert.ToBase64String(algorithm.GetBytes(HashingOptions.KeySize));
+            }
 
-                return $"{Options.Iterations}.{salt}.{key}";
-            }*/
-            var test = HashingOptions.Iterations;
-
-            return "";
+            return hashedPassword;
         }
 
-        public (bool Verified, bool NeedsUpgrade) Check(string hash, string password)
+        public bool Check(string password, string hash)
         {
-            var parts = hash.Split('.', 3);
+            string hashedPassword = Hash(password);
 
-            if (parts.Length != 3)
-            {
-                throw new FormatException("Unexpected hash format. " +
-                  "Should be formatted as `{iterations}.{salt}.{hash}`");
-            }
-
-            var iterations = Convert.ToInt32(parts[0]);
-            var salt = Convert.FromBase64String(parts[1]);
-            var key = Convert.FromBase64String(parts[2]);
-
-            var needsUpgrade = iterations != HashingOptions.Iterations;
-
-            using (var algorithm = new Rfc2898DeriveBytes(
-              password,
-              salt,
-              iterations,
-              HashAlgorithmName.SHA512))
-            {
-                var keyToCheck = algorithm.GetBytes(10);
-
-                var verified = keyToCheck.SequenceEqual(key);
-
-                return (verified, needsUpgrade);
-            }
+            return hash == hashedPassword;
         }
     }
 }

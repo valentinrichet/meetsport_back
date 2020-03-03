@@ -10,5 +10,7 @@ namespace MeetSport
         public const string CONNECTION_STRING_URL = "MeetSportUrl";
         public const string CONNECTION_STRING_VERSION = "MeetSportVersion";
         public const string SWAGGER = "Swagger";
+        public const string JWT = "Jwt";
+        public const string HASH = "Hash";
     }
 }

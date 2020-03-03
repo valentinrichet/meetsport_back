@@ -4,28 +4,31 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using MeetSport.Dbo;
 using MeetSport.Repositories;
 using MeetSport.Repositories.Database;
 using MeetSport.Business;
-using MeetSport.Business.Database;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Reflection;
 using System.IO;
 using MeetSport.Options;
-using MeetSport.Services;
 using MeetSport.Services.PasswordHasher;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using MeetSport.Services.JwtGenerator;
+using MeetSport.Business.Users;
+using Microsoft.AspNetCore.Authorization;
+using MeetSport.Services.Authorizations;
 
 namespace MeetSport
 {
@@ -41,6 +44,11 @@ namespace MeetSport
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            IConfigurationSection jwtSection = Configuration.GetSection(Settings.JWT);
+            IConfigurationSection swaggerSection = Configuration.GetSection(Settings.SWAGGER);
+            JwtOptions jwtOptions = jwtSection.Get<JwtOptions>();
+            SwaggerOptions swaggerOptions = swaggerSection.Get<SwaggerOptions>();
+
             /* Configure Database */
             services.AddDbContext<MeetSportContext>(optionsBuilder =>
             {
@@ -48,36 +56,57 @@ namespace MeetSport
             });
             /* ****************** */
 
+            /* Configure Jwt Authentication */
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+           .AddJwtBearer(x =>
+           {
+               x.RequireHttpsMetadata = false;
+               x.SaveToken = true;
+               x.TokenValidationParameters = new TokenValidationParameters
+               {
+                   ValidateIssuerSigningKey = true,
+                   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.IssuerKey)),
+                   ValidateIssuer = false,
+                   ValidateAudience = false,
+               };
+           });
+            /* **************************** */
+
             /* Configure Swagger */
             services.AddSwaggerGen(c =>
-            {
-                SwaggerOptions swaggerOptions = Configuration.GetSection(Settings.SWAGGER).Get<SwaggerOptions>();
+                 {
+                     c.SwaggerDoc("v1", new OpenApiInfo
+                     {
+                         Version = swaggerOptions.Version,
+                         Title = swaggerOptions.Title,
+                         Description = swaggerOptions.Description,
+                         Contact = new OpenApiContact
+                         {
+                             Name = swaggerOptions.Contact.Name,
+                             Email = swaggerOptions.Contact.Email
+                         }
+                     });
 
-                c.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Version = swaggerOptions.Version,
-                    Title = swaggerOptions.Title,
-                    Description = swaggerOptions.Description,
-                    Contact = new OpenApiContact
-                    {
-                        Name = swaggerOptions.Contact.Name,
-                        Email = swaggerOptions.Contact.Email
-                    }
-                });
-
-                // Set the comments path for the Swagger JSON and UI.
-                string xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
-                string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
-            });
+                     // Set the comments path for the Swagger JSON and UI.
+                     string xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
+                     string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                     c.IncludeXmlComments(xmlPath);
+                 });
             /* ***************** */
 
             /* Register Options */
-            services.AddOptions<HashingOptions>().Bind(Configuration.GetSection("Hash"));
+            services.AddOptions<JwtOptions>().Bind(jwtSection);
+            services.AddOptions<HashingOptions>().Bind(swaggerSection);
             /* ******************* */
 
             /* Register Services */
+            services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
+            
             /* ******************* */
 
             /* Register Automapper */
@@ -86,11 +115,19 @@ namespace MeetSport
 
             /* Register Repositories */
             services.AddScoped<IRepository<Role>, DbRepository<Role, MeetSportContext>>();
+            services.AddScoped<IUserRepository<User>, DbUserRepository<MeetSportContext>>();
             /* ********************* */
 
             /* Register Business */
             services.AddScoped<IBusiness<Role>, Business<Role, IRepository<Role>>>();
+            services.AddScoped<IUserBusiness<User>, DbUserBusiness>();
             /* ***************** */
+
+            /* Configure Authorization */
+            services.AddAuthorization();
+            services.AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
+            services.AddSingleton<IAuthorizationHandler, ClaimRequirementHandler>();
+            /* *********************** */
 
             /* Configure Cors */
             services.AddCors();
@@ -155,6 +192,8 @@ namespace MeetSport
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

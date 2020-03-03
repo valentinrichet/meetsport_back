@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MeetSport.Services
+namespace MeetSport.Services.PasswordHasher
 {
     public interface IPasswordHasher
     {

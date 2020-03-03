@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MeetSport.Business.Database
+namespace MeetSport.Business
 {
     public class Business<TEntity, TRepository> : IBusiness<TEntity>
     where TEntity : class

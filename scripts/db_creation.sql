@@ -1,5 +1,7 @@
-CREATE DATABASE IF NOT EXISTS `projet`
+CREATE DATABASE IF NOT EXISTS `projet`;
 USE `projet`;
+
+-- Drop Tables
 
 DROP TABLE IF EXISTS `EVENT_ATTENDEE`;
 DROP TABLE IF EXISTS `EVENT_COMMENT`;
@@ -13,16 +15,20 @@ DROP TABLE IF EXISTS `ROLE_CLAIM`;
 DROP TABLE IF EXISTS `ROLE`;
 DROP TABLE IF EXISTS `CLAIM`;
 
+-- Create Tables
+
 CREATE TABLE IF NOT EXISTS `ROLE` (
 `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 `name` tinytext NOT NULL,
-PRIMARY KEY (`id`)
+PRIMARY KEY (`id`),
+UNIQUE KEY `ROLE_key_name` (`name`) USING HASH
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `CLAIM` (
 `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 `name` tinytext NOT NULL,
-PRIMARY KEY (`id`)
+PRIMARY KEY (`id`),
+UNIQUE KEY `CLAIM_key_name` (`name`) USING HASH
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `ROLE_CLAIM` (
@@ -128,3 +134,28 @@ CREATE TABLE IF NOT EXISTS `EVENT_CHAT` (
   KEY `EVENT_CHAT_key_user` (`user`),
   CONSTRAINT `EVENT_CHAT_fk_user` FOREIGN KEY (`user`) REFERENCES `USER` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Insert Values
+
+INSERT INTO ROLE (`name`) VALUES
+('USER'), ('ADMIN'); -- user-1 & admin-2
+
+INSERT INTO CLAIM (`name`) VALUES
+('role:read'), ('role:write'), -- role: R-1 & W-2
+('claim:read'), ('claim:write'), -- claim: R-3 & W-4
+('roleclaim:read'), ('roleclaim:write'), -- roleclaim: R-5 & W-6
+('user:read'), ('user:write'), -- user: R-7 & W-8
+('place:read'), ('place:write'), -- place: R-9 & W-10
+('event:read'), ('event:write'), -- event: R-11 & W-12
+('eventattendee:read'), ('eventattendee:write'), -- eventattendee: R-13 & W-14
+('eventcomment:read'), ('eventcomment:write'), -- eventcomment: R-15 & W-16
+('eventchat:read'), ('eventchat:write'); -- eventchat: R-17 & W-18
+
+INSERT INTO ROLE_CLAIM (`role`, `claim`) VALUES
+-- user
+(1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13), (1, 14), (1, 15), (1, 16), (1, 17), (1, 18),
+-- admin
+(2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (2, 8), (2, 9), (2, 10), (2, 11), (2, 12), (2, 13), (2, 14), (2, 15), (2, 16), (2, 17), (2, 18);
+
+
+

@@ -13,9 +13,12 @@ using System.ComponentModel.DataAnnotations;
 using MeetSport.Business.Users;
 using MeetSport.Dto.Users;
 using Microsoft.AspNetCore.Authorization;
+using MeetSport.Services.Authorizations;
+using MeetSport.Exceptions;
 
 namespace MeetSport.Controllers
 {
+    [Authorize]
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
@@ -28,14 +31,7 @@ namespace MeetSport.Controllers
             _business = business;
         }
 
-        /// <summary>
-        /// Authenticate user
-        /// </summary>
-        /// <param name="userAuthenticationDto"></param>
-        /// <returns>JWT Token</returns>
-        /// <response code="200">Returns the JWT Token</response>
-        /// <response code="404">If authentication failed</response> 
-        [Authorize("CanRead")]
+        [Authorize(ClaimNames.RoleRead)]
         [HttpPost("authenticatetest")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -51,14 +47,21 @@ namespace MeetSport.Controllers
         /// <param name="userAuthenticationDto"></param>
         /// <returns>JWT Token</returns>
         /// <response code="200">Returns the JWT Token</response>
-        /// <response code="404">If authentication failed</response> 
+        /// <response code="401">If authentication failed</response> 
         [HttpPost("authenticate")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult> Authenticate(UserAuthenticationDto userAuthenticationDto)
         {
-            string token = await _business.Authenticate(userAuthenticationDto);
-            return Ok(token);
+            try
+            {
+                string token = await _business.Authenticate(userAuthenticationDto);
+                return Ok(token);
+            }
+            catch (AuthenticationFailedException exception)
+            {
+                return Unauthorized(exception.Message);
+            }
         }
 
         /// <summary>

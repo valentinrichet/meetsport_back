@@ -63,6 +63,10 @@ namespace MeetSport.Dbo
             {
                 entity.ToTable("CLAIM");
 
+                entity.HasIndex(e => e.Name)
+                    .HasName("CLAIM_key_name")
+                    .IsUnique();
+
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
                     .HasColumnType("bigint(20) unsigned");
@@ -107,6 +111,12 @@ namespace MeetSport.Dbo
                 entity.Property(e => e.Dislikes)
                     .HasColumnName("dislikes")
                     .HasColumnType("int(10) unsigned");
+
+                entity.Property(e => e.Image)
+                    .HasColumnName("image")
+                    .HasColumnType("tinytext")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_general_ci");
 
                 entity.Property(e => e.Likes)
                     .HasColumnName("likes")
@@ -154,6 +164,13 @@ namespace MeetSport.Dbo
                 entity.Property(e => e.User)
                     .HasColumnName("user")
                     .HasColumnType("bigint(20) unsigned");
+
+                entity.Property(e => e.State)
+                    .IsRequired()
+                    .HasColumnName("state")
+                    .HasColumnType("enum('WAITING','ACCEPTED')")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_general_ci");
 
                 entity.HasOne(d => d.EventNavigation)
                     .WithMany(p => p.EventAttendee)
@@ -286,9 +303,9 @@ namespace MeetSport.Dbo
                     .HasColumnName("id")
                     .HasColumnType("bigint(20) unsigned");
 
-                entity.Property(e => e.Adress)
+                entity.Property(e => e.Address)
                     .IsRequired()
-                    .HasColumnName("adress")
+                    .HasColumnName("address")
                     .HasColumnType("tinytext")
                     .HasCharSet("utf8")
                     .HasCollation("utf8_general_ci");
@@ -319,6 +336,10 @@ namespace MeetSport.Dbo
             modelBuilder.Entity<Role>(entity =>
             {
                 entity.ToTable("ROLE");
+
+                entity.HasIndex(e => e.Name)
+                    .HasName("ROLE_key_name")
+                    .IsUnique();
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
@@ -394,6 +415,12 @@ namespace MeetSport.Dbo
                     .IsRequired()
                     .HasColumnName("hashed_password")
                     .HasColumnType("text")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_general_ci");
+
+                entity.Property(e => e.Image)
+                    .HasColumnName("image")
+                    .HasColumnType("tinytext")
                     .HasCharSet("utf8")
                     .HasCollation("utf8_general_ci");
 

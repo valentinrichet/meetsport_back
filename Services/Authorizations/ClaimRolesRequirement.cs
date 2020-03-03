@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace MeetSport.Services.Authorizations
 {
-    public class ClaimRequirement : IAuthorizationRequirement
+    public class ClaimRolesRequirement : IAuthorizationRequirement
     {
         public string Claim { get; }
+        public IEnumerable<string> Roles { get; }
 
-        public ClaimRequirement(string claim)
+        public ClaimRolesRequirement(string claim, IEnumerable<string> roles)
         {
             Claim = claim ?? throw new ArgumentNullException(nameof(claim));
+            Roles = roles ?? throw new ArgumentNullException(nameof(roles));
         }
     }
 }

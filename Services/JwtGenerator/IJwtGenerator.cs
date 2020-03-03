@@ -7,7 +7,6 @@ namespace MeetSport.Services.JwtGenerator
 {
     public interface IJwtGenerator
     {
-        string GenerateToken(ulong userId, ulong roleId);
-        string GenerateToken(ulong userId, ulong roleId, IEnumerable<string> userClaims);
+        string GenerateToken(ulong userId, string role);
     }
 }

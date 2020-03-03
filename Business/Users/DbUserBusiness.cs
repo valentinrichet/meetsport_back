@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using MeetSport.Dto.Users;
 using MeetSport.Services.JwtGenerator;
 using MeetSport.Services.PasswordHasher;
+using MeetSport.Exceptions;
 
 namespace MeetSport.Business.Users
 {
@@ -26,15 +27,21 @@ namespace MeetSport.Business.Users
 
         public async Task<string> Authenticate(UserAuthenticationDto userAuthenticationDto)
         {
-            /*User user = await _repository.FindByMail(userAuthenticationDto.Email);
-            if (!_passwordHasher.Check(userAuthenticationDto.Password, user.HashedPassword))
+            User user = null;
+
+            try
             {
-                throw new Exception("Invalid mail or password");
+                user = await _repository.FindByMail(userAuthenticationDto.Email);
+            }
+            finally
+            {
+                if (user == null || !_passwordHasher.Check(userAuthenticationDto.Password, user.HashedPassword))
+                {
+                    throw new AuthenticationFailedException();
+                }
             }
 
-            string token = _jwtGenerator.GenerateToken(user.Id, user.Role);
-            */
-            string token = _jwtGenerator.GenerateToken(0, 1, new string[] { "sqfd", "CanRead", "pk"});
+            string token = _jwtGenerator.GenerateToken(user.Id, user.RoleNavigation.Name);
             return token;
         }
     }

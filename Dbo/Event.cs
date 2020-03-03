@@ -18,6 +18,7 @@ namespace MeetSport.Dbo
         public ulong Creator { get; set; }
         public ulong Place { get; set; }
         public DateTime Date { get; set; }
+        public string Image { get; set; }
         public uint Likes { get; set; }
         public uint Dislikes { get; set; }
 

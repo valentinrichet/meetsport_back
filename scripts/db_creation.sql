@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS `USER` (
   `hashed_password` text NOT NULL,
   `first_name` varchar(50) NOT NULL,
   `last_name` varchar(50) NOT NULL,
+  `image` tinytext,
   `birthday` date NOT NULL,
   `role` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
@@ -75,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `MOBILE_USER` (
 CREATE TABLE IF NOT EXISTS `PLACE` (
 `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 `title` tinytext NOT NULL,
-`adress` tinytext NOT NULL,
+`address` tinytext NOT NULL,
 `city` tinytext NOT NULL,
 `latitude` decimal(19, 16) NOT NULL,
 `longitude` decimal(19, 16) NOT NULL,
@@ -89,6 +90,7 @@ CREATE TABLE IF NOT EXISTS `EVENT` (
 `creator` bigint(20) unsigned NOT NULL,
 `place` bigint(20) unsigned NOT NULL,
 `date` date NOT NULL,
+`image` tinytext,
 `likes` int unsigned NOT NULL,
 `dislikes` int unsigned NOT NULL,
 PRIMARY KEY (`id`),
@@ -101,6 +103,7 @@ CONSTRAINT `EVENT_fk_place` FOREIGN KEY (`place`) REFERENCES `PLACE` (`id`) ON D
 CREATE TABLE IF NOT EXISTS `EVENT_ATTENDEE` (
 `event` bigint(20) unsigned NOT NULL,
 `user` bigint(20) unsigned NOT NULL,
+`state` enum('WAITING','ACCEPTED') NOT NULL,
 PRIMARY KEY (`event`,`user`),
 KEY `EVENT_ATTENDEE_key_event` (`event`),
 CONSTRAINT `EVENT_ATTENDEE_fk_event` FOREIGN KEY (`event`) REFERENCES `EVENT` (`id`) ON DELETE CASCADE,
@@ -156,6 +159,3 @@ INSERT INTO ROLE_CLAIM (`role`, `claim`) VALUES
 (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13), (1, 14), (1, 15), (1, 16), (1, 17), (1, 18),
 -- admin
 (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (2, 8), (2, 9), (2, 10), (2, 11), (2, 12), (2, 13), (2, 14), (2, 15), (2, 16), (2, 17), (2, 18);
-
-
-

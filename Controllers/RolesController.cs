@@ -10,9 +10,12 @@ using MeetSport.Repositories;
 using MeetSport.Business;
 using MeetSport.Dto.Roles;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
+using MeetSport.Services.Authorizations;
 
 namespace MeetSport.Controllers
 {
+    [Authorize]
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
@@ -34,6 +37,7 @@ namespace MeetSport.Controllers
         /// <param name="id"></param>
         /// <response code="204">Returns no content</response>
         [HttpDelete("{id}")]
+        [Authorize(ClaimNames.RoleWrite)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult<bool>> DeleteRole(ulong id)
         {
@@ -49,6 +53,7 @@ namespace MeetSport.Controllers
         /// <response code="200">Returns the Role with given Id</response>
         /// <response code="404">If the Role does not exist</response> 
         [HttpGet("{id}")]
+        [Authorize(ClaimNames.RoleRead)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RoleDto>> GetRole(ulong id)
@@ -69,6 +74,7 @@ namespace MeetSport.Controllers
         /// <returns>All roles</returns>
         /// <response code="200">Returns all roles</response>        
         [HttpGet]
+        [Authorize(ClaimNames.RoleRead)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<ICollection<RoleDto>>> GetRoles()
         {
@@ -86,6 +92,7 @@ namespace MeetSport.Controllers
         /// <returns>Created Role</returns>
         /// <response code="201">Returns the Created Role</response>
         [HttpPost]
+        [Authorize(ClaimNames.RoleWrite)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult> PostRole(CreateRoleDto createRoleDto)
         {
@@ -105,6 +112,7 @@ namespace MeetSport.Controllers
         /// <response code="200">Returns the Updated Role with given Id</response>
         /// <response code="400">If the Role does not exist</response>
         [HttpPut("{id}")]
+        [Authorize(ClaimNames.RoleWrite)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PutRole(ulong id, UpdateRoleDto updateRoleDto)

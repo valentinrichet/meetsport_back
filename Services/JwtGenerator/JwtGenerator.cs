@@ -26,22 +26,14 @@ namespace MeetSport.Services.JwtGenerator
             JwtOptions = jwtOptions.Value;
         }
 
-        public string GenerateToken(ulong userId, ulong roleId, IEnumerable<string> userClaims)
+        public string GenerateToken(ulong userId, string role)
         {
             ICollection<Claim> tokenClaims = new List<Claim>();
             JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
             byte[] key = Encoding.UTF8.GetBytes(JwtOptions.IssuerKey);
 
             tokenClaims.Add(new Claim(CustomClaimTypes.Name, userId.ToString()));
-            tokenClaims.Add(new Claim(CustomClaimTypes.Role, roleId.ToString()));
-
-            if (userClaims != null)
-            {
-                foreach(string userClaim in userClaims)
-                {
-                    tokenClaims.Add(new Claim(CustomClaimTypes.Claims, userClaim));
-                }
-            }
+            tokenClaims.Add(new Claim(CustomClaimTypes.Role, role));
 
             SecurityTokenDescriptor securityTokenDescriptor = new SecurityTokenDescriptor
             {
@@ -53,11 +45,6 @@ namespace MeetSport.Services.JwtGenerator
             string token = jwtSecurityTokenHandler.WriteToken(securityToken);
 
             return token;
-        }
-
-        public string GenerateToken(ulong userId, ulong roleId)
-        {
-            return GenerateToken(userId, roleId, null);
         }
     }
 }

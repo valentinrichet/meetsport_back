@@ -91,6 +91,14 @@ namespace MeetSport
                          }
                      });
 
+                     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                     {
+                         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                         Name = "Authorization",
+                         In = ParameterLocation.Header,
+                         Type = SecuritySchemeType.ApiKey
+                     });
+
                      // Set the comments path for the Swagger JSON and UI.
                      string xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
                      string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -126,7 +134,7 @@ namespace MeetSport
             /* Configure Authorization */
             services.AddAuthorization();
             services.AddSingleton<IAuthorizationPolicyProvider, AuthorizationPolicyProvider>();
-            services.AddSingleton<IAuthorizationHandler, ClaimRequirementHandler>();
+            services.AddSingleton<IAuthorizationHandler, ClaimRolesRequirementHandler>();
             /* *********************** */
 
             /* Configure Cors */

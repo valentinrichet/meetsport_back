@@ -25,17 +25,17 @@ namespace MeetSport.Business.Users
             _passwordHasher = passwordHasher;
         }
 
-        public async Task<string> Authenticate(UserAuthenticationDto userAuthenticationDto)
+        public async Task<string> Authenticate(AuthenticationUserDto authenticationUserDto)
         {
             User user = null;
 
             try
             {
-                user = await _repository.FindByMail(userAuthenticationDto.Email);
+                user = await _repository.FindByMail(authenticationUserDto.Email);
             }
             finally
             {
-                if (user == null || !_passwordHasher.Check(userAuthenticationDto.Password, user.HashedPassword))
+                if (user == null || !_passwordHasher.Check(authenticationUserDto.Password, user.HashedPassword))
                 {
                     throw new AuthenticationFailedException();
                 }
@@ -43,6 +43,11 @@ namespace MeetSport.Business.Users
 
             string token = _jwtGenerator.GenerateToken(user.Id, user.RoleNavigation.Name);
             return token;
+        }
+
+        public Task<string> Register(RegistrationUserDto registrationUserDto)
+        {
+            throw new NotImplementedException();
         }
     }
 }

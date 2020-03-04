@@ -404,6 +404,12 @@ namespace MeetSport.Dbo
                     .HasColumnName("birthday")
                     .HasColumnType("date");
 
+                entity.Property(e => e.Description)
+                    .HasColumnName("description")
+                    .HasColumnType("tinytext")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_general_ci");
+
                 entity.Property(e => e.FirstName)
                     .IsRequired()
                     .HasColumnName("first_name")

@@ -18,8 +18,9 @@ namespace MeetSport.Dbo
         public string HashedPassword { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Image { get; set; }
         public DateTime Birthday { get; set; }
+        public string Image { get; set; }
+        public string Description { get; set; }
         public ulong Role { get; set; }
 
         public virtual Role RoleNavigation { get; set; }

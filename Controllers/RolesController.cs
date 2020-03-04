@@ -12,6 +12,7 @@ using MeetSport.Dto.Roles;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using MeetSport.Services.Authorizations;
+using MeetSport.Business.Roles;
 
 namespace MeetSport.Controllers
 {
@@ -21,11 +22,29 @@ namespace MeetSport.Controllers
     [ApiController]
     public class RolesController : ControllerBase
     {
-        private readonly IBusiness<Role> _business;
+        private readonly IRoleBusiness<Role> _business;
 
-        public RolesController(IBusiness<Role> business)
+        public RolesController(IRoleBusiness<Role> business)
         {
             _business = business;
+        }
+
+        /// <summary>
+        /// Remove a Claim to a Role
+        /// </summary>
+        /// <remarks>
+        /// You must be an admin to use it
+        /// </remarks>
+        /// <param name="roleId"></param>
+        /// <param name="claimId"></param>
+        /// <response code="204">Returns No Content</response>
+        [HttpDelete("{roleId}/claims/{claimId}")]
+        [Authorize(ClaimNames.RoleWrite)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<ActionResult> DeleteClaimRole(ulong roleId, ulong claimId)
+        {
+            await _business.RemoveClaimFromRole(roleId, claimId);
+            return NoContent();
         }
 
         /// <summary>
@@ -80,6 +99,24 @@ namespace MeetSport.Controllers
         {
             ICollection<RoleDto> roles = await _business.GetAll<RoleDto>();
             return Ok(roles);
+        }
+
+        /// <summary>
+        /// Add a Claim to a Role
+        /// </summary>
+        /// <remarks>
+        /// You must be an admin to use it
+        /// </remarks>
+        /// <param name="id"></param>
+        /// <param name="addClaimRoleDto"></param>
+        /// <response code="204">Returns No Content</response>
+        [HttpPost("{id}/claims")]
+        [Authorize(ClaimNames.RoleWrite)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<ActionResult> PostClaimRole(ulong id, AddClaimRoleDto addClaimRoleDto)
+        {
+            await _business.AddClaimToRole(id, addClaimRoleDto.Id);
+            return NoContent();
         }
 
         /// <summary>

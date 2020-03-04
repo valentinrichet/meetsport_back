@@ -44,18 +44,18 @@ namespace MeetSport.Controllers
         /// <summary>
         /// Authenticate user
         /// </summary>
-        /// <param name="userAuthenticationDto"></param>
+        /// <param name="authenticationUserDto"></param>
         /// <returns>JWT Token</returns>
         /// <response code="200">Returns the JWT Token</response>
         /// <response code="401">If authentication failed</response> 
         [HttpPost("authenticate")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult> Authenticate(UserAuthenticationDto userAuthenticationDto)
+        public async Task<ActionResult> Authenticate(AuthenticationUserDto authenticationUserDto)
         {
             try
             {
-                string token = await _business.Authenticate(userAuthenticationDto);
+                string token = await _business.Authenticate(authenticationUserDto);
                 return Ok(token);
             }
             catch (AuthenticationFailedException exception)
@@ -156,6 +156,29 @@ namespace MeetSport.Controllers
             catch (ArgumentNullException)
             {
                 return BadRequest($"A role with id \"{id}\" was not found.");
+            }
+        }
+
+        /// <summary>
+        /// User registration
+        /// </summary>
+        /// <param name="registrationUserDto"></param>
+        /// <returns>Created User with JWT Token</returns>
+        /// <response code="201">Created User with JWT Token</response>
+        /// <response code="400">If authentication failed</response> 
+        [HttpPost("authenticate")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> Register(RegistrationUserDto registrationUserDto)
+        {
+            try
+            {
+                string token = await _business.Register(registrationUserDto);
+                return Ok(token);
+            }
+            catch (AuthenticationFailedException exception)
+            {
+                return Unauthorized(exception.Message);
             }
         }
     }

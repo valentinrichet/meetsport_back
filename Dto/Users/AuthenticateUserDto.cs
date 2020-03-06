@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace MeetSport.Dto.Users
 {
-    public class AuthenticationUserDto
+    public class AuthenticateUserDto
     {
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Mail { get; set; }
         [Required]
         public string Password { get; set; }
     }

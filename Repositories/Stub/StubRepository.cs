@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace MeetSport.Repositories.Stub
@@ -13,12 +14,32 @@ namespace MeetSport.Repositories.Stub
             throw new NotImplementedException();
         }
 
-        public Task Delete(params ulong[] primaryKey)
+        public Task Delete(TEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task<TEntity> Get(params ulong[] primaryKey)
+        public Task Delete(object primaryKey)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Delete(object primaryKeyA, object primaryKeyB)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<TEntity> Get(object primaryKey)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<TEntity> Get(object primaryKeyA, object primaryKeyB)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> predicate)
         {
             throw new NotImplementedException();
         }

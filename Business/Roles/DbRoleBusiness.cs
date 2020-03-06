@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MeetSport.Dbo;
 using MeetSport.Repositories;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace MeetSport.Business.Roles
     {
         protected readonly IRepository<RoleClaim> _roleClaimRepository;
 
-        public DbRoleBusiness(IRepository<Role> repository, IRepository<RoleClaim> roleClaimRepository, IMapper mapper) : base(repository, mapper)
+        public DbRoleBusiness(IRepository<Role> repository, IRepository<RoleClaim> roleClaimRepository, IMapper mapper, ILogger<IRoleBusiness<Role>> logger) : base(repository, mapper, logger)
         {
             _roleClaimRepository = roleClaimRepository;
         }

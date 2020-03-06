@@ -1,8 +1,10 @@
-﻿using MeetSport.Dbo;
+﻿using AutoMapper;
+using MeetSport.Dbo;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace MeetSport.Repositories.Database
@@ -24,7 +26,22 @@ namespace MeetSport.Repositories.Database
             return entity;
         }
 
-        public async Task Delete(params ulong[] primaryKey)
+        public async Task Delete(TEntity entity)
+        {
+            if (entity != null)
+            {
+                try
+                {
+                    _context.Set<TEntity>().Remove(entity);
+                    await _context.SaveChangesAsync();
+                } 
+                finally
+                {
+                }
+            }
+        }
+
+        public async Task Delete(object primaryKey)
         {
             TEntity entity = await Get(primaryKey);
 
@@ -35,20 +52,33 @@ namespace MeetSport.Repositories.Database
             }
         }
 
-        public async Task<TEntity> Get(params ulong[] primaryKey)
+        public async Task Delete(object primaryKeyA, object primaryKeyB)
         {
-            TEntity entity;
+            TEntity entity = await Get(primaryKeyA, primaryKeyB);
 
-            if(primaryKey.Length == 1)
+            if (entity != null)
             {
-                entity = await _context.Set<TEntity>().FindAsync(primaryKey[0]);
+                _context.Set<TEntity>().Remove(entity);
+                await _context.SaveChangesAsync();
             }
-            else
-            {
-                entity = await _context.Set<TEntity>().FindAsync(primaryKey);
-            }
-                          
+        }
+
+        public async ValueTask<TEntity> Get(object primaryKey)
+        {
+            TEntity entity = await _context.Set<TEntity>().FindAsync(primaryKey);
             return entity;
+        }
+
+        public async ValueTask<TEntity> Get(object primaryKeyA, object primaryKeyB)
+        {
+            TEntity entity = await _context.Set<TEntity>().FindAsync(primaryKeyA, primaryKeyB);
+            return entity;
+        }
+
+        public IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> predicate)
+        {
+            IQueryable<TEntity> queryable = _context.Set<TEntity>().Where(predicate);
+            return queryable;
         }
 
         public IQueryable<TEntity> GetAll()

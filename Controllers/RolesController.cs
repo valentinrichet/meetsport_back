@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MeetSport.Dbo;
-using MeetSport.Repositories;
-using MeetSport.Business;
 using MeetSport.Dto.Roles;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using MeetSport.Services.Authorizations;
 using MeetSport.Business.Roles;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Logging;
+using System.Collections;
 
 namespace MeetSport.Controllers
 {
@@ -20,11 +20,11 @@ namespace MeetSport.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class RolesController : ControllerBase
+    public class RolesController : Controller
     {
         private readonly IRoleBusiness<Role> _business;
 
-        public RolesController(IRoleBusiness<Role> business)
+        public RolesController(IRoleBusiness<Role> business, ILogger<RolesController> logger) : base(logger)
         {
             _business = business;
         }
@@ -77,7 +77,7 @@ namespace MeetSport.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RoleDto>> GetRole(ulong id)
         {
-            RoleDto roleDto = await _business.Get<RoleDto>(id);
+            RoleDto roleDto = await _business.GetFirstOrDefault<RoleDto>((role => role.Id == id));
 
             if (roleDto == null)
             {
@@ -110,13 +110,28 @@ namespace MeetSport.Controllers
         /// <param name="id"></param>
         /// <param name="addClaimRoleDto"></param>
         /// <response code="204">Returns No Content</response>
+        /// <response code="400">If the Role or Claim does not exist</response>
         [HttpPost("{id}/claims")]
         [Authorize(ClaimNames.RoleWrite)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> PostClaimRole(ulong id, AddClaimRoleDto addClaimRoleDto)
         {
-            await _business.AddClaimToRole(id, addClaimRoleDto.Id);
-            return NoContent();
+            try
+            {
+                await _business.AddClaimToRole(id, addClaimRoleDto.Id);
+                return NoContent();
+            }
+            catch(DbUpdateException exception)
+            {
+                if(exception.InnerException.Message.Contains("Duplicate entry"))
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return BadRequest("Role or Claim does not exist.");
+                }
+            }
         }
 
         /// <summary>
@@ -133,8 +148,15 @@ namespace MeetSport.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult> PostRole(CreateRoleDto createRoleDto)
         {
-            RoleDto roleDto = await _business.Add<RoleDto, CreateRoleDto>(createRoleDto);
-            return Created(roleDto.Id.ToString(), roleDto);
+            try
+            {
+                RoleDto roleDto = await _business.Add<RoleDto, CreateRoleDto>(createRoleDto);
+                return Created(roleDto.Id.ToString(), roleDto);
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest($"A role with the name \"{createRoleDto.Name}\" already exists.");
+            }
         }
 
         /// <summary>

@@ -14,12 +14,8 @@ namespace MeetSport.Mappings
         {
             CreateMap<Role, RoleDto>()
                 .ForMember(
-                    x => x.RoleClaim,
+                    x => x.Claims,
                     opt => opt.MapFrom(r => r.RoleClaim.Select(rc => rc.Claim).ToList())
-                )
-                .ForMember(
-                    x => x.User,
-                    opt => opt.MapFrom(r => r.User.Select(user => user.Id).ToList())
                 );
 
             CreateMap<CreateRoleDto, Role>();

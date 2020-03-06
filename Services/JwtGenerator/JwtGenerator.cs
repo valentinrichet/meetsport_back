@@ -15,7 +15,7 @@ namespace MeetSport.Services.JwtGenerator
     {
         public sealed class CustomClaimTypes
         {
-            public static string Name { get; } = "Name";
+            public static string Id { get; } = "Id";
             public static string Role { get; } = "Role";
             public static string Claims { get; } = "Claims";
         }
@@ -32,7 +32,7 @@ namespace MeetSport.Services.JwtGenerator
             JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
             byte[] key = Encoding.UTF8.GetBytes(JwtOptions.IssuerKey);
 
-            tokenClaims.Add(new Claim(CustomClaimTypes.Name, userId.ToString()));
+            tokenClaims.Add(new Claim(CustomClaimTypes.Id, userId.ToString()));
             tokenClaims.Add(new Claim(CustomClaimTypes.Role, role));
 
             SecurityTokenDescriptor securityTokenDescriptor = new SecurityTokenDescriptor

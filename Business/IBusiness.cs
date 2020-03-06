@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace MeetSport.Business
@@ -8,9 +9,12 @@ namespace MeetSport.Business
     public interface IBusiness<TEntity>
     {
         Task<Dto> Add<Dto, CreationDto>(CreationDto entityDto);
-        Task Delete(params ulong[] primaryKey);
-        Task<Dto> Get<Dto>(params ulong[] primaryKey);
+        Task Delete(object primaryKey);
+        Task Delete(object primaryKeyA, object primaryKeyB);
+        Task<ICollection<Dto>> Get<Dto>(Expression<Func<TEntity, bool>> predicate);
         Task<ICollection<Dto>> GetAll<Dto>();
-        Task<Dto> Update<Dto, UpdateDto>(UpdateDto entityDto, params ulong[] primaryKey);
+        Task<Dto> GetFirstOrDefault<Dto>(Expression<Func<TEntity, bool>> predicate);
+        Task<Dto> Update<Dto, UpdateDto>(UpdateDto entityDto, object primaryKey);
+        Task<Dto> Update<Dto, UpdateDto>(UpdateDto entityDto, object primaryKeyA, object primaryKeyB);
     }
 }

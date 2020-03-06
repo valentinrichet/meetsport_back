@@ -15,30 +15,21 @@ using MeetSport.Dto.Users;
 using Microsoft.AspNetCore.Authorization;
 using MeetSport.Services.Authorizations;
 using MeetSport.Exceptions;
+using MeetSport.Services.JwtGenerator;
+using Microsoft.Extensions.Logging;
 
 namespace MeetSport.Controllers
 {
-    [Authorize]
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController : AuthorizedController
     {
         private readonly IUserBusiness<User> _business;
 
-        public UsersController(IUserBusiness<User> business)
+        public UsersController(IUserBusiness<User> business, ILogger<UsersController> logger) : base(logger)
         {
             _business = business;
-        }
-
-        [Authorize(ClaimNames.RoleRead)]
-        [HttpPost("authenticatetest")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult> AuthenticateTest()
-        {
-            //string token = await _business.Authenticate(userAuthenticationDto);
-            return Ok("valid");
         }
 
         /// <summary>
@@ -48,10 +39,11 @@ namespace MeetSport.Controllers
         /// <returns>JWT Token</returns>
         /// <response code="200">Returns the JWT Token</response>
         /// <response code="401">If authentication failed</response> 
+        [AllowAnonymous]
         [HttpPost("authenticate")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult> Authenticate(AuthenticationUserDto authenticationUserDto)
+        public async Task<ActionResult> Authenticate(AuthenticateUserDto authenticationUserDto)
         {
             try
             {
@@ -65,120 +57,103 @@ namespace MeetSport.Controllers
         }
 
         /// <summary>
-        /// Delete a Role by Id
+        /// Delete a User by Id
         /// </summary>
         /// <remarks>
-        /// You must be an admin to use it
+        /// You must be an admin to use it or you must be the user
         /// </remarks>
         /// <param name="id"></param>
         /// <response code="204">Returns no content</response>
+        /// <response code="401">If not authorized</response> 
+        [Authorize(ClaimNames.UserWrite)]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult<bool>> DeleteRole(ulong id)
+        public async Task<ActionResult<bool>> DeleteUser(ulong id)
         {
+            if (!IsAdmin() && !IsUser(id))
+            {
+                return Unauthorized("You can not delete this user.");
+            }
+
             await _business.Delete(id);
             return NoContent();
         }
 
         /// <summary>
-        /// Get a Role by Id
+        /// Get a User by Id
         /// </summary>
         /// <param name="id"></param>
-        /// <returns>Role with given Id</returns>
-        /// <response code="200">Returns the Role with given Id</response>
-        /// <response code="404">If the Role does not exist</response> 
+        /// <returns>User with given Id</returns>
+        /// <response code="200">Returns the User with given Id</response>
+        /// <response code="404">If the User does not exist</response> 
+        [Authorize(ClaimNames.UserRead)]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<RoleDto>> GetRole(ulong id)
+        public async Task<ActionResult<UserDto>> GetUser(ulong id)
         {
-            RoleDto roleDto = await _business.Get<RoleDto>(id);
+            UserDto userDto = await _business.GetFirstOrDefault<UserDto>((user => user.Id == id));
 
-            if (roleDto == null)
+            if (userDto == null)
             {
                 return NotFound($"A user with id \"{id}\" was not found.");
             }
 
-            return Ok(roleDto);
+            return Ok(userDto);
         }
 
         /// <summary>
-        /// Get All Roles
+        /// Create a User
         /// </summary>
-        /// <returns>All roles</returns>
-        /// <response code="200">Returns all roles</response>        
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<ICollection<RoleDto>>> GetRoles()
-        {
-            ICollection<RoleDto> roles = await _business.GetAll<RoleDto>();
-            return Ok(roles);
-        }
-
-        /// <summary>
-        /// Create a Role
-        /// </summary>
-        /// <remarks>
-        /// You must be an admin to use it
-        /// </remarks>
-        /// <param name="createRoleDto"></param>
+        /// <param name="createUserDto"></param>
         /// <returns>Created Role</returns>
         /// <response code="201">Returns the Created Role</response>
+        [AllowAnonymous]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult> PostRole(CreateRoleDto createRoleDto)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> PostUser(CreateUserDto createUserDto)
         {
-            RoleDto roleDto = await _business.Add<RoleDto, CreateRoleDto>(createRoleDto);
-            return Created(roleDto.Id.ToString(), roleDto);
+            try
+            {
+                UserDto userDto = await _business.Register<UserDto, CreateUserDto>(createUserDto);
+                return Created(userDto.Id.ToString(), userDto);
+            } catch(DbUpdateException)
+            {
+                return BadRequest($"A user with the mail \"{createUserDto.Mail}\" already exists.");
+            }
         }
 
         /// <summary>
-        /// Update a Role by Id
+        /// Update a User by Id
         /// </summary>
         /// <remarks>
-        /// You must be an admin to use it
+        /// You must be an admin to use it or you must be the user
         /// </remarks>
         /// <param name="id"></param>
-        /// <param name="updateRoleDto"></param>
-        /// <returns>Updated Role with given Id</returns>
-        /// <response code="200">Returns the Updated Role with given Id</response>
-        /// <response code="400">If the Role does not exist</response>
+        /// <param name="updateUserDto"></param>
+        /// <returns>Updated User with given Id</returns>
+        /// <response code="200">Returns the Updated User with given Id</response>
+        /// <response code="400">If the User does not exist</response>
+        [Authorize(ClaimNames.UserWrite)]
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> PutRole(ulong id, UpdateRoleDto updateRoleDto)
+        public async Task<IActionResult> PutUser(ulong id, UpdateUserDto updateUserDto)
         {
+            if (!IsAdmin() && !IsUser(id))
+            {
+                return Unauthorized("You can not update this user.");
+            }
+
             try
             {
-                RoleDto roleDto = await _business.Update<RoleDto, UpdateRoleDto>(updateRoleDto, id);
-                return Ok(roleDto);
+                UserDto userDto = await _business.Update<UserDto, UpdateUserDto>(updateUserDto, id);
+                return Ok(userDto);
             }
             catch (ArgumentNullException)
             {
-                return BadRequest($"A role with id \"{id}\" was not found.");
-            }
-        }
-
-        /// <summary>
-        /// User registration
-        /// </summary>
-        /// <param name="registrationUserDto"></param>
-        /// <returns>Created User with JWT Token</returns>
-        /// <response code="201">Created User with JWT Token</response>
-        /// <response code="400">If authentication failed</response> 
-        [HttpPost("authenticate")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> Register(RegistrationUserDto registrationUserDto)
-        {
-            try
-            {
-                string token = await _business.Register(registrationUserDto);
-                return Ok(token);
-            }
-            catch (AuthenticationFailedException exception)
-            {
-                return Unauthorized(exception.Message);
+                return BadRequest($"A user with id \"{id}\" was not found.");
             }
         }
     }

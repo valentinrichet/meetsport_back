@@ -9,7 +9,7 @@ namespace MeetSport.Business.Users
 {
     public interface IUserBusiness<TEntity> : IBusiness<TEntity>
     {
-        Task<string> Authenticate(AuthenticationUserDto authenticationUserDto);
-        Task<string> Register(RegistrationUserDto registrationUserDto);
+        Task<string> Authenticate(AuthenticateUserDto authenticationUserDto);
+        Task<Dto> Register<Dto, CreationDto>(CreationDto creationDto);
     }
 }

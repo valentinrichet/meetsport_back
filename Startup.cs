@@ -29,6 +29,7 @@ using MeetSport.Services.JwtGenerator;
 using MeetSport.Business.Users;
 using Microsoft.AspNetCore.Authorization;
 using MeetSport.Services.Authorizations;
+using MeetSport.Business.Roles;
 
 namespace MeetSport
 {
@@ -95,11 +96,24 @@ namespace MeetSport
                      {
                          Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
                          Name = "Authorization",
+                         BearerFormat = "JWT",
+                         Scheme = "bearer",
                          In = ParameterLocation.Header,
-                         Type = SecuritySchemeType.ApiKey
+                         Type = SecuritySchemeType.Http
                      });
 
-                     // Set the comments path for the Swagger JSON and UI.
+                     c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                     {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
+                            },
+                            new List<string>()
+                        }
+                     });
+
+                     // Set the comments path for the Swagger JSON and UI.gfdgdfnb !:
                      string xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
                      string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                      c.IncludeXmlComments(xmlPath);
@@ -108,13 +122,13 @@ namespace MeetSport
 
             /* Register Options */
             services.AddOptions<JwtOptions>().Bind(jwtSection);
-            services.AddOptions<HashingOptions>().Bind(swaggerSection);
+            services.AddOptions<HashingOptions>().Bind(Configuration.GetSection("Hash"));
             /* ******************* */
 
             /* Register Services */
             services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
-            
+
             /* ******************* */
 
             /* Register Automapper */
@@ -123,11 +137,12 @@ namespace MeetSport
 
             /* Register Repositories */
             services.AddScoped<IRepository<Role>, DbRepository<Role, MeetSportContext>>();
-            services.AddScoped<IUserRepository<User>, DbUserRepository<MeetSportContext>>();
+            services.AddScoped<IRepository<RoleClaim>, DbRepository<RoleClaim, MeetSportContext>>();
+            services.AddScoped<IRepository<User>, DbRepository<User, MeetSportContext>>();
             /* ********************* */
 
             /* Register Business */
-            services.AddScoped<IBusiness<Role>, Business<Role, IRepository<Role>>>();
+            services.AddScoped<IRoleBusiness<Role>, DbRoleBusiness>();
             services.AddScoped<IUserBusiness<User>, DbUserBusiness>();
             /* ***************** */
 

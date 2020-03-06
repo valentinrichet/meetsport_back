@@ -14,8 +14,6 @@ namespace MeetSport.Dto.Roles
         public string Name { get; set; }
 
         [Required]
-        public ICollection<ulong> RoleClaim { get; set; }
-        [Required]
-        public ICollection<ulong> User { get; set; }
+        public ICollection<ulong> Claims { get; set; }
     }
 }

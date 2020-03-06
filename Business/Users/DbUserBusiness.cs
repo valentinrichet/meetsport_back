@@ -11,27 +11,28 @@ using MeetSport.Dto.Users;
 using MeetSport.Services.JwtGenerator;
 using MeetSport.Services.PasswordHasher;
 using MeetSport.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace MeetSport.Business.Users
 {
-    public class DbUserBusiness : Business<User, IUserRepository<User>>, IUserBusiness<User>
+    public class DbUserBusiness : Business<User, IRepository<User>>, IUserBusiness<User>
     {
         private IJwtGenerator _jwtGenerator;
         private IPasswordHasher _passwordHasher;
 
-        public DbUserBusiness(IUserRepository<User> repository, IMapper mapper, IJwtGenerator jwtGenerator, IPasswordHasher passwordHasher) : base(repository, mapper)
+        public DbUserBusiness(IRepository<User> repository, IMapper mapper, ILogger<IUserBusiness<User>> logger, IJwtGenerator jwtGenerator,  IPasswordHasher passwordHasher) : base(repository, mapper, logger)
         {
             _jwtGenerator = jwtGenerator;
             _passwordHasher = passwordHasher;
         }
 
-        public async Task<string> Authenticate(AuthenticationUserDto authenticationUserDto)
+        public Task<string> Authenticate(AuthenticateUserDto authenticationUserDto)
         {
             User user = null;
 
             try
             {
-                user = await _repository.FindByMail(authenticationUserDto.Email);
+                user = _repository.Get(user => user.Mail == authenticationUserDto.Mail).Include(user => user.RoleNavigation).Single();
             }
             finally
             {
@@ -42,12 +43,17 @@ namespace MeetSport.Business.Users
             }
 
             string token = _jwtGenerator.GenerateToken(user.Id, user.RoleNavigation.Name);
-            return token;
+            return Task.FromResult(token);
         }
 
-        public Task<string> Register(RegistrationUserDto registrationUserDto)
+        public async Task<Dto> Register<Dto, CreationDto>(CreationDto creationDto)
         {
-            throw new NotImplementedException();
+            User user = _mapper.Map<User>(creationDto);
+            user.Role = 1;
+            user.HashedPassword = _passwordHasher.Hash(user.HashedPassword);
+            user = await _repository.Add(user);
+            Dto mappedUser = _mapper.Map<Dto>(user);
+            return mappedUser;
         }
     }
 }

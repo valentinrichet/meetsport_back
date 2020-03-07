@@ -6,5 +6,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    networks: 
+    ports:
+      - "8080:80"
+    networks:
       - mariadb_default
+
+networks:
+  mariadb_default:
+    external: true

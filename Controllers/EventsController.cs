@@ -36,7 +36,7 @@ namespace MeetSport.Controllers
         /// </remarks>
         /// <param name="id"></param>
         /// <response code="204">Returns no content</response>
-        /// <response code="401>If unauthorized</response>
+        /// <response code="401">If unauthorized</response>
         [HttpDelete("{id}")]
         [Authorize(ClaimNames.EventWrite)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -117,7 +117,7 @@ namespace MeetSport.Controllers
                 EventDto eventDto = await _business.CreateEvent<EventDto>(createEventDto);
                 return Created(eventDto.Id.ToString(), eventDto);
             }
-            catch (DbUpdateException exception)
+            catch (DbUpdateException)
             {
                 return BadRequest($"The creator does not exist.");
             }

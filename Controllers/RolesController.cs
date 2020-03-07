@@ -185,6 +185,10 @@ namespace MeetSport.Controllers
             {
                 return BadRequest($"A role with id \"{id}\" was not found.");
             }
+            catch (DbUpdateException)
+            {
+                return BadRequest($"A role with the name \"{updateRoleDto.Name}\" already exists.");
+            }
         }
     }
 }

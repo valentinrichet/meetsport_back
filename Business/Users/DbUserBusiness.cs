@@ -32,7 +32,7 @@ namespace MeetSport.Business.Users
 
             try
             {
-                user = _repository.Get(user => user.Mail == authenticationUserDto.Mail).Include(user => user.RoleNavigation).Single();
+                user = _repository.GetAll().Where(user => user.Mail == authenticationUserDto.Mail).Include(user => user.RoleNavigation).Single();
             }
             finally
             {
@@ -46,14 +46,29 @@ namespace MeetSport.Business.Users
             return Task.FromResult(token);
         }
 
-        public async Task<Dto> Register<Dto, CreationDto>(CreationDto creationDto)
+        public async Task<Dto> Register<Dto>(CreateUserDto createUserDto)
         {
-            User user = _mapper.Map<User>(creationDto);
+            User user = _mapper.Map<User>(createUserDto);
             user.Role = 1;
-            user.HashedPassword = _passwordHasher.Hash(user.HashedPassword);
+            user.HashedPassword = _passwordHasher.Hash(createUserDto.Password);
             user = await _repository.Add(user);
             Dto mappedUser = _mapper.Map<Dto>(user);
             return mappedUser;
+        }
+
+        public async Task<Dto> UpdateUser<Dto>(UpdateUserDto updateDto, object primaryKey)
+        {
+            User user = await _repository.Get(primaryKey);
+            _mapper.Map(updateDto, user);
+
+            if(updateDto.Password != null)
+            {
+                user.HashedPassword = _passwordHasher.Hash(updateDto.Password);
+            }
+
+            user = await _repository.Update(user);
+            Dto mappedEntity = _mapper.Map<Dto>(user);
+            return mappedEntity;
         }
     }
 }

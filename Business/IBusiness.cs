@@ -11,9 +11,9 @@ namespace MeetSport.Business
         Task<Dto> Add<Dto, CreationDto>(CreationDto entityDto);
         Task Delete(object primaryKey);
         Task Delete(object primaryKeyA, object primaryKeyB);
-        Task<ICollection<Dto>> Get<Dto>(Expression<Func<TEntity, bool>> predicate);
+        Task<ICollection<Dto>> Get<Dto>(Expression<Func<TEntity, bool>> where);
         Task<ICollection<Dto>> GetAll<Dto>();
-        Task<Dto> GetFirstOrDefault<Dto>(Expression<Func<TEntity, bool>> predicate);
+        Task<Dto> GetFirstOrDefault<Dto>(Expression<Func<TEntity, bool>> where);
         Task<Dto> Update<Dto, UpdateDto>(UpdateDto entityDto, object primaryKey);
         Task<Dto> Update<Dto, UpdateDto>(UpdateDto entityDto, object primaryKeyA, object primaryKeyB);
     }

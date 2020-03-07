@@ -116,7 +116,7 @@ namespace MeetSport.Controllers
         {
             try
             {
-                UserDto userDto = await _business.Register<UserDto, CreateUserDto>(createUserDto);
+                UserDto userDto = await _business.Register<UserDto>(createUserDto);
                 return Created(userDto.Id.ToString(), userDto);
             } catch(DbUpdateException)
             {
@@ -148,7 +148,7 @@ namespace MeetSport.Controllers
 
             try
             {
-                UserDto userDto = await _business.Update<UserDto, UpdateUserDto>(updateUserDto, id);
+                UserDto userDto = await _business.UpdateUser<UserDto>(updateUserDto, id);
                 return Ok(userDto);
             }
             catch (ArgumentNullException)

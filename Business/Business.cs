@@ -43,9 +43,9 @@ namespace MeetSport.Business
             return _repository.Delete(primaryKeyA, primaryKeyB);
         }
 
-        public async Task<ICollection<Dto>> Get<Dto>(Expression<Func<TEntity, bool>> predicate)
+        public async Task<ICollection<Dto>> Get<Dto>(Expression<Func<TEntity, bool>> where)
         {
-            IQueryable<TEntity> queryable = _repository.Get(predicate);
+            IQueryable<TEntity> queryable = _repository.GetAll().Where(where);
             ICollection<Dto> mappedEntities = await _mapper.ProjectTo<Dto>(queryable).ToListAsync();
             return mappedEntities;
         }
@@ -57,9 +57,9 @@ namespace MeetSport.Business
             return mappedEntities;
         }
 
-        public Task<Dto> GetFirstOrDefault<Dto>(Expression<Func<TEntity, bool>> predicate)
+        public Task<Dto> GetFirstOrDefault<Dto>(Expression<Func<TEntity, bool>> where)
         {
-            IQueryable<TEntity> queryable = _repository.Get(predicate);
+            IQueryable<TEntity> queryable = _repository.GetAll().Where(where);
             Dto mappedEntity = _mapper.ProjectTo<Dto>(queryable).FirstOrDefault();
             return Task.FromResult(mappedEntity);
         }

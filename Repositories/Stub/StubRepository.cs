@@ -39,11 +39,6 @@ namespace MeetSport.Repositories.Stub
             throw new NotImplementedException();
         }
 
-        public IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
         public IQueryable<TEntity> GetAll()
         {
             throw new NotImplementedException();

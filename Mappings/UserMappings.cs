@@ -22,11 +22,18 @@ namespace MeetSport.Mappings
                     opt => opt.MapFrom(u => u.Event.Select(e => e.Id).ToList())
                 );
 
-            CreateMap<CreateUserDto, User>()
+            CreateMap<CreateUserDto, User>();
+
+            CreateMap<UpdateUserDto, User>()
                 .ForMember(
-                    x => x.HashedPassword,
-                    opt => opt.MapFrom(u => u.Password)
-                );
+                    x => x.Role,
+                    opt => opt.Condition((src) => src.Role != null)
+                )
+                .ForMember(
+                    x => x.Birthday,
+                    opt => opt.Condition((src) => src.Birthday != null)
+                )
+                .ForAllOtherMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }

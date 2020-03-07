@@ -139,11 +139,14 @@ namespace MeetSport
             services.AddScoped<IRepository<Role>, DbRepository<Role, MeetSportContext>>();
             services.AddScoped<IRepository<RoleClaim>, DbRepository<RoleClaim, MeetSportContext>>();
             services.AddScoped<IRepository<User>, DbRepository<User, MeetSportContext>>();
+            services.AddScoped<IRepository<Event>, DbRepository<Event, MeetSportContext>>();
+            services.AddScoped<IRepository<EventAttendee>, DbRepository<EventAttendee, MeetSportContext>>();
             /* ********************* */
 
             /* Register Business */
             services.AddScoped<IRoleBusiness<Role>, DbRoleBusiness>();
             services.AddScoped<IUserBusiness<User>, DbUserBusiness>();
+            services.AddScoped<IEventBusiness<Event>, DbEventBusiness>();
             /* ***************** */
 
             /* Configure Authorization */

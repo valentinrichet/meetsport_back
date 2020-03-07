@@ -10,6 +10,7 @@ namespace MeetSport.Business.Users
     public interface IUserBusiness<TEntity> : IBusiness<TEntity>
     {
         Task<string> Authenticate(AuthenticateUserDto authenticationUserDto);
-        Task<Dto> Register<Dto, CreationDto>(CreationDto creationDto);
+        Task<Dto> Register<Dto>(CreateUserDto createUserDto);
+        Task<Dto> UpdateUser<Dto>(UpdateUserDto updateDto, object primaryKey);
     }
 }

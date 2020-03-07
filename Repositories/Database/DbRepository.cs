@@ -75,12 +75,6 @@ namespace MeetSport.Repositories.Database
             return entity;
         }
 
-        public IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> predicate)
-        {
-            IQueryable<TEntity> queryable = _context.Set<TEntity>().Where(predicate);
-            return queryable;
-        }
-
         public IQueryable<TEntity> GetAll()
         {
             IQueryable<TEntity> queryable = _context.Set<TEntity>();

@@ -64,10 +64,11 @@ namespace MeetSport.Controllers
         /// </remarks>
         /// <param name="id"></param>
         /// <response code="204">Returns no content</response>
-        /// <response code="401">If not authorized</response> 
+        /// <response code="401">If unauthorized</response> 
         [Authorize(ClaimNames.UserWrite)]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<bool>> DeleteUser(ulong id)
         {
             if (!IsAdmin() && !IsUser(id))
@@ -108,6 +109,7 @@ namespace MeetSport.Controllers
         /// <param name="createUserDto"></param>
         /// <returns>Created Role</returns>
         /// <response code="201">Returns the Created Role</response>
+        /// <response code="400">If a user with the same mail already exists</response>
         [AllowAnonymous]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -116,7 +118,7 @@ namespace MeetSport.Controllers
         {
             try
             {
-                UserDto userDto = await _business.Register<UserDto>(createUserDto);
+                UserDto userDto = await _business.CreateUser<UserDto>(createUserDto);
                 return Created(userDto.Id.ToString(), userDto);
             } catch(DbUpdateException)
             {
@@ -135,10 +137,12 @@ namespace MeetSport.Controllers
         /// <returns>Updated User with given Id</returns>
         /// <response code="200">Returns the Updated User with given Id</response>
         /// <response code="400">If the User does not exist</response>
+        /// <response code="401">If unauthorized</response>
         [Authorize(ClaimNames.UserWrite)]
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> PutUser(ulong id, UpdateUserDto updateUserDto)
         {
             if (!IsAdmin() && !IsUser(id))

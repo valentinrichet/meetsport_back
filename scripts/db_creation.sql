@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `EVENT` (
 `description` tinytext NOT NULL,
 `creator` bigint(20) unsigned NOT NULL,
 `place` bigint(20) unsigned NOT NULL,
-`date` date NOT NULL,
+`date` datetime NOT NULL,
 `image` tinytext,
 `likes` int unsigned NOT NULL,
 `dislikes` int unsigned NOT NULL,
@@ -160,3 +160,14 @@ INSERT INTO ROLE_CLAIM (`role`, `claim`) VALUES
 (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13), (1, 14), (1, 15), (1, 16), (1, 17), (1, 18),
 -- admin
 (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (2, 8), (2, 9), (2, 10), (2, 11), (2, 12), (2, 13), (2, 14), (2, 15), (2, 16), (2, 17), (2, 18);
+
+INSERT INTO USER (`mail`, `hashed_password`, `first_name`, `last_name`, `birthday`, `role`) VALUES ('MeetSport@MeetSport.com', '/mdmnnInzbLIkYVTiULB/cauKiAYS/uRJRIrvK5YR+A=', 'ADMIN', 'ADMIN', '2020-03-07', 2);
+
+INSERT INTO PLACE (`title`, `address`, `city`, `latitude`, `longitude`) VALUES
+('Jardin Lecoq', 'Boulevard François Mitterrand, Avenue Vercingétorix, 63000 Clermont-Ferrand', 'CLERMONT-FERRAND', 45.77220916748047, 3.0883965492248535),
+('Keep Cool', '3 Boulevard Gergovia, 63000 Clermont-Ferrand', 'CLERMONT-FERRAND', 45.773170471191406, 3.0924789905548096),
+('ISIMA', 'Rue de la Chebarde, 63170 Aubière', 'AUBIERE', 45.7592416, 3.1110281);
+
+INSERT INTO EVENT (`title`, `description`, `creator`, `place`, `date`, `likes`, `dislikes`) VALUES
+('Séance Musculation Intensive', 'Séance de musculation intensive avec des coachs. Séance gratuite.', 1, 2, '2020-04-11T14:00:00', 0, 0),
+('Match de foot', 'Petit match de football dans le parc.', 1, 1, '2020-04-3T17:30:00', 0, 0);

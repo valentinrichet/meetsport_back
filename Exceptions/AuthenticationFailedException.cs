@@ -7,7 +7,7 @@ namespace MeetSport.Exceptions
 {
     public class AuthenticationFailedException : Exception
     {
-        public AuthenticationFailedException() : base("Invalid mail or password")
+        public AuthenticationFailedException() : base("Invalid mail or password.")
         {
         }
 

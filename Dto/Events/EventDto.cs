@@ -17,7 +17,7 @@ namespace MeetSport.Dto.Events
         [Required]
         public ulong Creator { get; set; }
         [Required]
-        public ulong Place { get; set; }
+        public PlaceDto Place { get; set; }
         [Required]
         public DateTime Date { get; set; }
         public string Image { get; set; }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MeetSport.Dbo;
+using MeetSport.Exceptions;
 using MeetSport.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -25,22 +26,42 @@ namespace MeetSport.Business
             this._logger = logger;
         }
 
-        public async Task<Dto> Add<Dto, CreationDto>(CreationDto creationDto)
+        public async Task<Dto> Add<Dto, CreationDto>(CreationDto creationDto, Func<TEntity, bool> conditionToAdd = null)
         {
             TEntity entity = _mapper.Map<TEntity>(creationDto);
+
+            if (conditionToAdd != null && !conditionToAdd.Invoke(entity))
+            {
+                throw new ConditionFailedException();
+            }
+
             entity = await _repository.Add(entity);
             Dto mappedEntity = _mapper.Map<Dto>(entity);
             return mappedEntity;
         }
 
-        public Task Delete(object primaryKey)
+        public async Task Delete(object primaryKey, Func<TEntity, bool> conditionToDelete = null)
         {
-            return _repository.Delete(primaryKey);
+            TEntity entity = await _repository.Get(primaryKey);
+
+            if (conditionToDelete != null && !conditionToDelete.Invoke(entity))
+            {
+                throw new ConditionFailedException();
+            }
+
+            await _repository.Delete(entity);
         }
 
-        public Task Delete(object primaryKeyA, object primaryKeyB)
+        public async Task Delete(object primaryKeyA, object primaryKeyB = null, Func<TEntity, bool> conditionToDelete = null)
         {
-            return _repository.Delete(primaryKeyA, primaryKeyB);
+            TEntity entity = await _repository.Get(primaryKeyA, primaryKeyB);
+
+            if (conditionToDelete != null && !conditionToDelete.Invoke(entity))
+            {
+                throw new ConditionFailedException();
+            }
+
+            await _repository.Delete(entity);
         }
 
         public async Task<ICollection<Dto>> Get<Dto>(Expression<Func<TEntity, bool>> where)
@@ -64,18 +85,30 @@ namespace MeetSport.Business
             return Task.FromResult(mappedEntity);
         }
 
-        public async Task<Dto> Update<Dto, UpdateDto>(UpdateDto updateDto, object primaryKey)
+        public async Task<Dto> Update<Dto, UpdateDto>(object primaryKey, UpdateDto updateDto, Func<TEntity, bool> conditionToUpdate = null)
         {
             TEntity entity = await _repository.Get(primaryKey);
+
+            if(conditionToUpdate != null && !conditionToUpdate.Invoke(entity))
+            {
+                throw new ConditionFailedException();
+            }
+
             _mapper.Map(updateDto, entity);
             entity = await _repository.Update(entity);
             Dto mappedEntity = _mapper.Map<Dto>(entity);
             return mappedEntity;
         }
 
-        public async Task<Dto> Update<Dto, UpdateDto>(UpdateDto updateDto, object primaryKeyA, object primaryKeyB)
+        public async Task<Dto> Update<Dto, UpdateDto>(object primaryKeyA, object primaryKeyB, UpdateDto updateDto, Func<TEntity, bool> conditionToUpdate = null)
         {
             TEntity entity = await _repository.Get(primaryKeyA, primaryKeyB);
+
+            if (conditionToUpdate != null && !conditionToUpdate.Invoke(entity))
+            {
+                throw new ConditionFailedException();
+            }
+
             _mapper.Map(updateDto, entity);
             entity = await _repository.Update(entity);
             Dto mappedEntity = _mapper.Map<Dto>(entity);

@@ -12,6 +12,8 @@ namespace MeetSport.Mappings
     {
         public EventMappings()
         {
+            CreateMap<Place, PlaceDto>();
+
             CreateMap<EventComment, EventCommentDto>();
 
             CreateMap<CreateEventDto, Event>();
@@ -24,9 +26,17 @@ namespace MeetSport.Mappings
                 .ForMember(
                     x => x.EventComment,
                     opt => opt.MapFrom(s => s.EventComment)
+                )
+                .ForMember(
+                    x => x.Place,
+                    opt => opt.MapFrom(s => s.PlaceNavigation)
                 );
 
             CreateMap<UpdateEventDto, Event>()
+                .ForMember(
+                   x => x.Creator,
+                   opt => opt.Condition((src) => src.Creator != null)
+               )
                .ForMember(
                    x => x.Date,
                    opt => opt.Condition((src) => src.Date != null)

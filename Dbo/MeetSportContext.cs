@@ -99,7 +99,7 @@ namespace MeetSport.Dbo
 
                 entity.Property(e => e.Date)
                     .HasColumnName("date")
-                    .HasColumnType("date");
+                    .HasColumnType("datetime");
 
                 entity.Property(e => e.Description)
                     .IsRequired()

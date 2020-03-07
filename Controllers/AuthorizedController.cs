@@ -13,6 +13,23 @@ namespace MeetSport.Controllers
     [Authorize]
     public abstract class AuthorizedController : Controller
     {
+        protected string UserId 
+        {
+            get
+            {
+                return User.FindFirst(claim => claim.Type == JwtGenerator.CustomClaimTypes.Id).Value;
+            }
+        }
+
+        protected string Role
+        {
+            get
+            {
+                return User.FindFirst(claim => claim.Type == JwtGenerator.CustomClaimTypes.Role).Value;
+            }
+        }
+
+
         public AuthorizedController(ILogger<AuthorizedController> logger) : base(logger)
         {
         }

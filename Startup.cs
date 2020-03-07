@@ -30,6 +30,7 @@ using MeetSport.Business.Users;
 using Microsoft.AspNetCore.Authorization;
 using MeetSport.Services.Authorizations;
 using MeetSport.Business.Roles;
+using MeetSport.Business.Events;
 
 namespace MeetSport
 {

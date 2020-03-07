@@ -41,28 +41,6 @@ namespace MeetSport.Repositories.Database
             }
         }
 
-        public async Task Delete(object primaryKey)
-        {
-            TEntity entity = await Get(primaryKey);
-
-            if (entity != null)
-            {
-                _context.Set<TEntity>().Remove(entity);
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        public async Task Delete(object primaryKeyA, object primaryKeyB)
-        {
-            TEntity entity = await Get(primaryKeyA, primaryKeyB);
-
-            if (entity != null)
-            {
-                _context.Set<TEntity>().Remove(entity);
-                await _context.SaveChangesAsync();
-            }
-        }
-
         public async ValueTask<TEntity> Get(object primaryKey)
         {
             TEntity entity = await _context.Set<TEntity>().FindAsync(primaryKey);

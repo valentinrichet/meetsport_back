@@ -11,8 +11,6 @@ namespace MeetSport.Repositories
     {
         Task<TEntity> Add(TEntity entity);
         Task Delete(TEntity entity);
-        Task Delete(object primaryKey);
-        Task Delete(object primaryKeyA, object primaryKeyB);
         ValueTask<TEntity> Get(object primaryKey);
         ValueTask<TEntity> Get(object primaryKeyA, object primaryKeyB);
         IQueryable<TEntity> GetAll();

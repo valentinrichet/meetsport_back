@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  meetsport:
+    image: ${DOCKER_REGISTRY-}meetsport
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks: 
+      - mariadb_default

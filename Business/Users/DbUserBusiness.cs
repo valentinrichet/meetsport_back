@@ -46,7 +46,7 @@ namespace MeetSport.Business.Users
             return Task.FromResult(token);
         }
 
-        public async Task<Dto> Register<Dto>(CreateUserDto createUserDto)
+        public async Task<Dto> CreateUser<Dto>(CreateUserDto createUserDto)
         {
             User user = _mapper.Map<User>(createUserDto);
             user.Role = 1;
@@ -56,7 +56,7 @@ namespace MeetSport.Business.Users
             return mappedUser;
         }
 
-        public async Task<Dto> UpdateUser<Dto>(UpdateUserDto updateDto, object primaryKey)
+        public async Task<Dto> UpdateUser<Dto>(UpdateUserDto updateDto, ulong primaryKey)
         {
             User user = await _repository.Get(primaryKey);
             _mapper.Map(updateDto, user);

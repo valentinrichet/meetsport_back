@@ -26,7 +26,8 @@ namespace MeetSport.Business.Roles
 
         public async Task RemoveClaimFromRole(ulong roleId, ulong claimId)
         {
-            await _roleClaimRepository.Delete(roleId, claimId);
+            RoleClaim roleClaim = await _roleClaimRepository.Get(roleId, claimId);
+            await _roleClaimRepository.Delete(roleClaim);
         }
     }
 }

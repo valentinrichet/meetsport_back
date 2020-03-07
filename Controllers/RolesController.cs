@@ -143,9 +143,11 @@ namespace MeetSport.Controllers
         /// <param name="createRoleDto"></param>
         /// <returns>Created Role</returns>
         /// <response code="201">Returns the Created Role</response>
+        /// <response code="400">If a role with the same name already exists</response>
         [HttpPost]
         [Authorize(ClaimNames.RoleWrite)]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> PostRole(CreateRoleDto createRoleDto)
         {
             try
@@ -169,7 +171,7 @@ namespace MeetSport.Controllers
         /// <param name="updateRoleDto"></param>
         /// <returns>Updated Role with given Id</returns>
         /// <response code="200">Returns the Updated Role with given Id</response>
-        /// <response code="400">If the Role does not exist</response>
+        /// <response code="400">If the Role does not exist or if a role with the same name already exists</response>
         [HttpPut("{id}")]
         [Authorize(ClaimNames.RoleWrite)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -178,7 +180,7 @@ namespace MeetSport.Controllers
         {
             try
             {
-                RoleDto roleDto = await _business.Update<RoleDto, UpdateRoleDto>(updateRoleDto, id);
+                RoleDto roleDto = await _business.Update<RoleDto, UpdateRoleDto>(id, updateRoleDto);
                 return Ok(roleDto);
             }
             catch (ArgumentNullException)
